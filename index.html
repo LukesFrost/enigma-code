@@ -7,7 +7,49 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Enigma</h1>
+    <div class="app">
+        <header class="header">
+            <h1>Enigma</h1>
+            <p class="subtitle">Statická substituce a 1‑rotorová Enigma (Rotor I + Reflektor B)</p>
+        </header>
+
+        <main class="card">
+            <div class="controls">
+                <label class="field">
+                    <span>Režim</span>
+                    <select id="mode">
+                        <option value="staticky">Statická substituce</option>
+                        <option value="enigma" selected>Enigma (1 rotor)</option>
+                    </select>
+                </label>
+
+                <div class="buttons">
+                    <button id="btnRun" type="button">Šifrovat</button>
+                    <button id="btnReset" type="button" class="secondary">Reset rotoru</button>
+                </div>
+            </div>
+
+            <label class="field">
+                <span>Vstup</span>
+                <textarea id="input" rows="4" placeholder="Zadej text (mezery, interpunkce i diakritika zůstanou beze změny)">AAAA</textarea>
+            </label>
+
+            <label class="field">
+                <span>Výstup</span>
+                <textarea id="output" rows="4" readonly></textarea>
+            </label>
+
+            <details class="hint">
+                <summary>Rychlé testy (zadání)</summary>
+                <ul>
+                    <li>Staticky: vstup <code>AAAA</code> → výstup <code>EEEE</code></li>
+                    <li>Enigma: po resetu rotoru vstup <code>AAAA</code> → výstup <code>HJKP</code></li>
+                    <li>Reciprocita: po resetu rotoru vstup <code>HJKP</code> → výstup <code>AAAA</code></li>
+                </ul>
+            </details>
+        </main>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
