@@ -1,119 +1,124 @@
+:root {
+    --bg-color: #2c2c2c;
+    --panel-color: #3d3d3d;
+    --text-color: #e0e0e0;
+    --accent-color: #d4af37; /* Zlatá/mosazná barva */
+    --input-bg: #1a1a1a;
+    --font-typewriter: 'Courier New', Courier, monospace;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background: radial-gradient(1200px 700px at 20% 10%, #eef4ff 0%, #f6f7fb 40%, #f2f2f2 100%);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
-    padding: 24px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
 }
 
-.app {
-    max-width: 900px;
-    margin: 0 auto;
+.container {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
 }
 
-.header {
+header {
     text-align: center;
-    margin-bottom: 18px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--accent-color);
 }
 
 h1 {
-    margin: 0;
-    font-size: 2.2rem;
-    color: #255DDD;
+    font-family: var(--font-typewriter);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-color);
 }
 
-.subtitle {
-    margin: 8px 0 0;
-    color: #4b5563;
+.machine-interface {
+    background-color: var(--panel-color);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    border: 1px solid #555;
 }
 
-.card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 14px;
-    padding: 48px;
-    box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+.input-group, .output-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--accent-color);
+    color: #fff;
+    font-family: var(--font-typewriter);
+    font-size: 1.2rem;
+    box-sizing: border-box; /* Aby padding nerozbil šířku */
+}
+
+small {
+    color: #888;
+    font-size: 0.8rem;
 }
 
 .controls {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 12px;
-    align-items: end;
-    margin-bottom: 12px;
-}
-
-.field {
-    display: grid;
-    gap: 6px;
-    margin: 10px 0;
-}
-
-.field > span {
-    font-size: 0.95rem;
-    color: #374151;
-}
-
-select,
-textarea {
-    width: 100%;
-    border-radius: 10px;
-    border: 1px solid #d1d5db;
-    padding: 10px 12px;
-    font-size: 1rem;
-    outline: none;
-}
-
-textarea {
-    resize: vertical;
-    min-height: 90px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-}
-
-select:focus,
-textarea:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-}
-
-.buttons {
     display: flex;
     gap: 10px;
-    justify-content: end;
+    margin-bottom: 20px;
     flex-wrap: wrap;
 }
 
-button {
-    border: 0;
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 1rem;
+.btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
-    background: #255DDD;
-    color: white;
+    font-weight: bold;
+    transition: transform 0.1s;
 }
 
-button:hover {
-    filter: brightness(1.05);
+.btn:active {
+    transform: scale(0.98);
 }
 
-button.secondary {
-    background: #111827;
+.primary { background-color: var(--accent-color); color: #000; }
+.secondary { background-color: #555; color: #fff; }
+.danger { background-color: #8b0000; color: #fff; }
+
+.output-display {
+    background-color: #000;
+    color: var(--accent-color);
+    padding: 15px;
+    font-family: var(--font-typewriter);
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    min-height: 30px;
+    border-radius: 5px;
+    word-break: break-all;
 }
 
-.hint {
-    margin-top: 10px;
-    color: #374151;
+.info-box {
+    margin-top: 30px;
+    font-size: 0.9rem;
+    color: #aaa;
+    background: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 8px;
 }
 
-.hint code {
-    background: #f3f4f6;
-    padding: 1px 6px;
-    border-radius: 6px;
-}
-
-@media (max-width: 640px) {
-    body { padding: 14px; }
-    .controls { grid-template-columns: 1fr; }
-    .buttons { justify-content: stretch; }
-    button { width: 100%; }
+footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 0.8rem;
+    color: #666;
 }

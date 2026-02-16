@@ -1,4 +1,3 @@
-"use strict";
 var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
         if (ar || !(i in from)) {
@@ -8,165 +7,131 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetRotor = resetRotor;
-exports.sifrujStaticky = sifrujStaticky;
-exports.enigma = enigma;
-exports.sifrujText = sifrujText;
-// Rotor I + Reflektor B (nejpouzivanejsi nastaveni nemecke armady)
-var rotorDefault = "EKMFLGDQVZNTOWYHXUSPAIBRCJ".split("");
-var reflektor = "YRUHQSLDPXNGOKMIEBFZCWVJAT".split("");
-// Stav rotoru (bude se otacet). Default nechavame bokem kvuli resetu.
-var rotor = rotorDefault.slice();
-
-function resetRotor() {
-    rotor.length = 0;
-    Array.prototype.push.apply(rotor, rotorDefault);
-}
-
-function normalizeAZ(ch) {
-    if (!ch)
-        return { kind: "passthrough", value: ch };
-    var upper = ch.toUpperCase();
-    if (upper.length !== 1)
-        return { kind: "passthrough", value: ch };
-    var code = upper.charCodeAt(0);
-    var isAZ = code >= 65 && code <= 90;
-    if (!isAZ)
-        return { kind: "passthrough", value: ch };
-    return { kind: "az", upper: upper };
-}
-
-// 1) Staticka substituce (bez rotace)
-function sifrujStaticky(znak) {
-    var n = normalizeAZ(znak);
-    if (n.kind === "passthrough")
-        return n.value;
-    var index = n.upper.charCodeAt(0) - 65;
-    return rotor[index];
-}
-
-// 2) Mini-enigma (1 rotor): tam -> reflektor -> zpet + posuv
-function enigma(znak) {
-    var n = normalizeAZ(znak);
-    if (n.kind === "passthrough")
-        return n.value;
-    var index = n.upper.charCodeAt(0) - 65;
-    var znakTam = rotor[index];
-    var indexRefl = znakTam.charCodeAt(0) - 65;
-    var znakRefl = reflektor[indexRefl];
-    var indexZpet = rotor.indexOf(znakRefl);
-    var vystup = String.fromCharCode(indexZpet + 65);
-    rotor.push(rotor.shift());
-    return vystup;
-}
-
-function sifrujText(text, mode) {
-    var fn = mode === "staticky" ? sifrujStaticky : enigma;
-    var out = "";
-    for (var _i = 0, text_1 = text; _i < text_1.length; _i++) {
-        var ch = text_1[_i];
-        out += fn(ch);
-    }
-    return out;
-}
-
-window.enigmaDemo = {
-    reset: function () { return resetRotor(); },
-    stat: function (s) { return sifrujText(s, "staticky"); },
-    run: function (s) { return sifrujText(s, "enigma"); },
-};
-
-// UI wiring
-function byId(id) {
-    return document.getElementById(id);
-}
-
-var inputEl = byId("input");
-var outputEl = byId("output");
-var modeEl = byId("mode");
-var btnRun = byId("btnRun");
-var btnReset = byId("btnReset");
-
-function runFromUi() {
-    if (!inputEl || !outputEl || !modeEl)
-        return;
-    var mode = modeEl.value === "staticky" ? "staticky" : "enigma";
-    outputEl.value = sifrujText(inputEl.value || "", mode);
-}
-
-if (btnRun)
-    btnRun.addEventListener("click", runFromUi);
-if (btnReset)
-    btnReset.addEventListener("click", function () {
-        resetRotor();
-        runFromUi();
-    });
-
-// prvni vykresleni
-runFromUi();
-function resetRotor() {
-    rotor.length = 0;
-    rotor.push.apply(rotor, rotorDefault);
+// Konfigurace stroje (Rotor I a Reflektor B)
+var ROTOR_INIT = "EKMFLGDQVZNTOWYHXUSPAIBRCJ".split("");
+var REFLEKTOR = "YRUHQSLDPXNGOKMIEBFZCWVJAT".split("");
+// Globální stav rotoru (aby se mohl točit)
+var aktualniRotor = __spreadArray([], ROTOR_INIT, true);
+/**
+ * Pomocná funkce pro normalizaci textu.
+ * Odstraní diakritiku (Č -> C) a převede na velká písmena.
+ */
+function normalizujText(text) {
+    return text
+        .normalize("NFD") // Rozloží znaky (např. Č na C + háček)
+        .replace(/[\u0300-\u036f]/g, "") // Odstraní diakritická znaménka
+        .toUpperCase();
 }
 /**
- * Normalizuje vstup na jedno velke pismeno A-Z.
- * - mezery a bezne oddelovace vraci beze zmeny
- * - mala pismena mapuje na velka
- * - znaky mimo A-Z (diakritika, emoji, interpunkce) vraci beze zmeny
+ * 1. ÚKOL: Statická substituce
+ * Šifruje bez pohybu rotoru.
  */
-function normalizeAZ(ch) {
-    if (!ch)
-        return { kind: "passthrough", value: ch };
-    // pokud je to mala/velka latina, udelej velke
-    var upper = ch.toUpperCase();
-    if (upper.length !== 1)
-        return { kind: "passthrough", value: ch };
-    var code = upper.charCodeAt(0);
-    var isAZ = code >= 65 && code <= 90;
-    if (!isAZ)
-        return { kind: "passthrough", value: ch };
-    return { kind: "az", upper: upper };
-}
-// 1) Staticka substituce (BEZ pohybu rotoru)
-function sifrujStaticky(znak) {
-    var n = normalizeAZ(znak);
-    if (n.kind === "passthrough")
-        return n.value;
-    var index = n.upper.charCodeAt(0) - 65;
-    return rotor[index];
-}
-// 2) Mini-enigma (1 rotor): TAM -> reflektor -> ZPET + posuv rotoru po znaku
-function enigma(znak) {
-    var n = normalizeAZ(znak);
-    if (n.kind === "passthrough")
-        return n.value;
-    // mapovani vstupu na index 0..25
-    var index = n.upper.charCodeAt(0) - 65;
-    // cesta TAM: rotor[index] -> znak
-    var znakTam = rotor[index];
-    // reflektor: reflektor[index(znakTam)]
-    var indexRefl = znakTam.charCodeAt(0) - 65;
-    var znakRefl = reflektor[indexRefl];
-    // cesta ZPET: najdi pozici znaku z reflektoru v rotoru
-    var indexZpet = rotor.indexOf(znakRefl);
-    var vystup = String.fromCharCode(indexZpet + 65);
-    // mechanicky posuv rotoru (rotace o 1)
-    rotor.push(rotor.shift());
+function sifrujStaticky(vstup) {
+    var vystup = "";
+    // Pro jistotu použijeme čistou kopii rotoru, aby neovlivnil stav
+    var statickyRotor = __spreadArray([], ROTOR_INIT, true);
+    var normalizovanyVstup = normalizujText(vstup);
+    for (var i = 0; i < normalizovanyVstup.length; i++) {
+        var znak = normalizovanyVstup[i];
+        var kodZnaku = znak.charCodeAt(0);
+        // Pokud je to písmeno A-Z (ASCII 65-90)
+        if (kodZnaku >= 65 && kodZnaku <= 90) {
+            var index = kodZnaku - 65;
+            vystup += statickyRotor[index];
+        }
+        else {
+            // Mezery a jiné znaky necháme být
+            vystup += znak;
+        }
+    }
     return vystup;
 }
-function sifrujText(text, mode) {
-    var fn = mode === "staticky" ? sifrujStaticky : enigma;
-    var out = "";
-    for (var _i = 0, text_1 = text; _i < text_1.length; _i++) {
-        var ch = text_1[_i];
-        out += fn(ch);
+/**
+ * 2. ÚKOL: Simulace Enigmy
+ * Kompletní cyklus: Cesta TAM -> Reflektor -> Cesta ZPĚT -> Posun rotoru
+ */
+function enigma(vstup) {
+    var vystup = "";
+    var normalizovanyVstup = normalizujText(vstup);
+    for (var i = 0; i < normalizovanyVstup.length; i++) {
+        var znak = normalizovanyVstup[i];
+        var kodZnaku = znak.charCodeAt(0);
+        // Zpracujeme pouze písmena A-Z
+        if (kodZnaku >= 65 && kodZnaku <= 90) {
+            // 1. Vstupní index (A=0, B=1...)
+            var indexVstup = kodZnaku - 65;
+            // 2. Cesta TAM (Rotor)
+            var znakTam = aktualniRotor[indexVstup];
+            // 3. Reflektor (Symetrický odraz)
+            // Zjistíme index znaku, který vylezl z rotoru
+            var indexProReflektor = znakTam.charCodeAt(0) - 65;
+            var znakRefl = REFLEKTOR[indexProReflektor];
+            // 4. Cesta ZPĚT (Hledáme pozici v rotoru)
+            var indexZpet = aktualniRotor.indexOf(znakRefl);
+            // Převod indexu zpět na znak
+            var vyslednyZnak = String.fromCharCode(indexZpet + 65);
+            vystup += vyslednyZnak;
+            // 5. Mechanický posuv (Rotace pole)
+            // shift() vezme první prvek, push() ho dá na konec
+            var prvniPrvek = aktualniRotor.shift();
+            if (prvniPrvek) {
+                aktualniRotor.push(prvniPrvek);
+            }
+        }
+        else {
+            // Znaky mimo abecedu (mezery) se nešifrují a NEPOSOUVAJÍ rotor
+            vystup += znak;
+        }
     }
-    return out;
+    return vystup;
 }
-window.enigmaDemo = {
-    reset: function () { return resetRotor(); },
-    stat: function (s) { return sifrujText(s, "staticky"); },
-    run: function (s) { return sifrujText(s, "enigma"); },
-};
-var text = "Hello, World!";
+/**
+ * Funkce pro resetování stroje do základního nastavení
+ * (Vyvolá se tlačítkem na webu)
+ */
+function resetujStroj() {
+    aktualniRotor = __spreadArray([], ROTOR_INIT, true);
+    console.log("--- Enigma resetována do základní polohy ---");
+    alert("Rotor byl vrácen do výchozí polohy.");
+}
+// --- Ověření funkčnosti v konzoli (dle zadání) ---
+console.log("--- TEST ZADÁNÍ 1 (Statická substituce) ---");
+console.log("Vstup: AAAA");
+console.log("Očekáváno: EEEE");
+console.log("Realita: " + sifrujStaticky("AAAA"));
+console.log("\n--- TEST ZADÁNÍ 2 (Enigma s rotací) ---");
+// Resetujeme rotor před testem, aby seděl výsledek
+aktualniRotor = __spreadArray([], ROTOR_INIT, true);
+console.log("Vstup: AAAA");
+console.log("Očekáváno: HJKP");
+console.log("Realita: " + enigma("AAAA"));
+console.log("\n--- TEST RECIPROCITY (Dešifrování) ---");
+// Resetujeme pro dešifrování (příjemce musí mít stejné nastavení jako odesílatel)
+aktualniRotor = __spreadArray([], ROTOR_INIT, true);
+console.log("Vstup (šifra): HJKP");
+console.log("Očekáváno: AAAA");
+console.log("Realita: " + enigma("HJKP"));
+// --- Propojení s HTML (Pokud běží v prohlížeči) ---
+// Tato část kódu se spustí až po načtení stránky
+document.addEventListener("DOMContentLoaded", function () {
+    var btnStat = document.getElementById("btn-static");
+    var btnEnigma = document.getElementById("btn-enigma");
+    var btnReset = document.getElementById("btn-reset");
+    var input = document.getElementById("input-text");
+    var output = document.getElementById("output-text");
+    if (btnStat && input && output) {
+        btnStat.addEventListener("click", function () {
+            output.textContent = sifrujStaticky(input.value);
+        });
+    }
+    if (btnEnigma && input && output) {
+        btnEnigma.addEventListener("click", function () {
+            output.textContent = enigma(input.value);
+        });
+    }
+    if (btnReset) {
+        btnReset.addEventListener("click", function () {
+            resetujStroj();
+        });
+    }
+});

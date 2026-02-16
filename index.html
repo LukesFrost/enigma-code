@@ -1,53 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enigma sigma balls</title>
+    <title>Enigma Simulator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="app">
-        <header class="header">
-            <h1>Enigma</h1>
-            <p class="subtitle">Statická substituce a 1‑rotorová Enigma (Rotor I + Reflektor B)</p>
+    <div class="container">
+        <header>
+            <h1>Enigma I</h1>
+            <p>Emulátor elektromechanického šifrovacího stroje</p>
         </header>
 
-        <main class="card">
-            <div class="controls">
-                <label class="field">
-                    <span>Režim</span>
-                    <select id="mode">
-                        <option value="staticky">Statická substituce</option>
-                        <option value="enigma" selected>Enigma (1 rotor)</option>
-                    </select>
-                </label>
+        <main>
+            <div class="machine-interface">
+                <div class="input-group">
+                    <label for="input-text">Vstupní zpráva:</label>
+                    <input type="text" id="input-text" placeholder="Zadejte text (např. AAAA)...">
+                    <small>Podporuje diakritiku, automaticky převádí na VELKÁ.</small>
+                </div>
 
-                <div class="buttons">
-                    <button id="btnRun" type="button">Šifrovat</button>
-                    <button id="btnReset" type="button" class="secondary">Reset rotoru</button>
+                <div class="controls">
+                    <button id="btn-static" class="btn secondary">1. Statická Šifra</button>
+                    <button id="btn-enigma" class="btn primary">2. Enigma (Rotace)</button>
+                    <button id="btn-reset" class="btn danger">Resetovat Rotor</button>
+                </div>
+
+                <div class="output-group">
+                    <h2>Výstup (Šifra):</h2>
+                    <div id="output-text" class="output-display">...</div>
                 </div>
             </div>
 
-            <label class="field">
-                <span>Vstup</span>
-                <textarea id="input" rows="4" placeholder="Zadej text (mezery, interpunkce i diakritika zůstanou beze změny)">AAAA</textarea>
-            </label>
-
-            <label class="field">
-                <span>Výstup</span>
-                <textarea id="output" rows="4" readonly></textarea>
-            </label>
-
-            <details class="hint">
-                <summary>Rychlé testy (zadání)</summary>
+            <section class="info-box">
+                <h3>Jak to funguje?</h3>
                 <ul>
-                    <li>Staticky: vstup <code>AAAA</code> → výstup <code>EEEE</code></li>
-                    <li>Enigma: po resetu rotoru vstup <code>AAAA</code> → výstup <code>HJKP</code></li>
-                    <li>Reciprocita: po resetu rotoru vstup <code>HJKP</code> → výstup <code>AAAA</code></li>
+                    <li><strong>Statická šifra:</strong> Pouhá substituce bez pohybu stroje. AAAA -> EEEE.</li>
+                    <li><strong>Enigma:</strong> Plná simulace. Rotor se po každém znaku otočí. AAAA -> HJKP.</li>
+                    <li><strong>Reciprocita:</strong> Pokud resetujete stroj a vložíte zašifrovaný text, dostanete původní zprávu.</li>
                 </ul>
-            </details>
+            </section>
         </main>
+
+        <footer>
+            Informatický model dle zadání | Rotor I, Reflektor B
+        </footer>
     </div>
 
     <script src="script.js"></script>
