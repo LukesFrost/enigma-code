@@ -1,55 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enigma sigma balls</title>
+    <title>Enigma Code Simulator</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app">
-        <header class="header">
-            <h1>Enigma</h1>
-            <p class="subtitle">Statická substituce a 1‑rotorová Enigma (Rotor I + Reflektor B)</p>
+    <div class="container">
+        <header>
+            <h1>Enigma: Simulátor kódu</h1>
+            <p>Projekt do hodin informatiky inspirovaný historií.</p>
         </header>
 
-        <main class="card">
-            <div class="controls">
-                <label class="field">
-                    <span>Režim</span>
-                    <select id="mode">
-                        <option value="staticky">Statická substituce</option>
-                        <option value="enigma" selected>Enigma (1 rotor)</option>
-                    </select>
-                </label>
-
-                <div class="buttons">
-                    <button id="btnRun" type="button">Šifrovat</button>
-                    <button id="btnReset" type="button" class="secondary">Reset rotoru</button>
+        <main>
+            <section class="simulator">
+                <h2>Úkol 1: Statická substituce</h2>
+                <p>Tato funkce nahradí každý znak podle pevně daného klíče v rotoru, bez jeho otáčení. Simuluje nejjednodušší formu šifrování.</p>
+                <div class="io-panel">
+                    <textarea id="static-input" placeholder="Zadejte text pro statickou šifru..."></textarea>
+                    <button id="static-encrypt-btn">→</button>
+                    <textarea id="static-output" readonly placeholder="Výsledek..."></textarea>
                 </div>
-            </div>
+            </section>
 
-            <label class="field">
-                <span>Vstup</span>
-                <textarea id="input" rows="4" placeholder="Zadej text (mezery, interpunkce i diakritika zůstanou beze změny)">AAAA</textarea>
-            </label>
-
-            <label class="field">
-                <span>Výstup</span>
-                <textarea id="output" rows="4" readonly></textarea>
-            </label>
-
-            <details class="hint">
-                <summary>Rychlé testy (zadání)</summary>
-                <ul>
-                    <li>Staticky: vstup <code>AAAA</code> → výstup <code>EEEE</code></li>
-                    <li>Enigma: po resetu rotoru vstup <code>AAAA</code> → výstup <code>HJKP</code></li>
-                    <li>Reciprocita: po resetu rotoru vstup <code>HJKP</code> → výstup <code>AAAA</code></li>
-                </ul>
-            </details>
+            <section class="simulator">
+                <h2>Úkol 2: Simulace Enigmy</h2>
+                <p>Tato funkce simuluje kompletní cyklus Enigmy s jedním rotorem, reflektorem a mechanickým otáčením po každém znaku. Díky reciprocitě funguje stejně pro šifrování i dešifrování.</p>
+                <div class="io-panel">
+                    <textarea id="enigma-input" placeholder="Zadejte text k šifrování/dešifrování..."></textarea>
+                    <div class="enigma-controls">
+                        <button id="enigma-process-btn">Šifrovat / Dešifrovat</button>
+                        <button id="enigma-reset-btn">Resetovat Rotor</button>
+                    </div>
+                    <textarea id="enigma-output" readonly placeholder="Výsledek..."></textarea>
+                </div>
+            </section>
         </main>
+        
+        <footer>
+            <p>Vytvořil student jako projekt do IT. Inspirováno historií a prací Alana Turinga.</p>
+        </footer>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>

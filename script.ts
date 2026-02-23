@@ -1,108 +1,143 @@
-// Rotor I + Reflektor B (nejpouzivanejsi nastaveni nemecke armady)
-const rotorDefault: string[] = "EKMFLGDQVZNTOWYHXUSPAIBRCJ".split("");
-const reflektor: string[] = "YRUHQSLDPXNGOKMIEBFZCWVJAT".split("");
+// Definice rotoru a reflektoru podle zadání
+const rotorMap: string[] = "EKMFLGDQVZNTOWYHXUSPAIBRCJ".split("");
+const reflektorMap: string[] = "YRUHQSLDPXNGOKMIEBFZCWVJAT".split("");
 
-// Stav rotoru (bude se otacet). Default nechavame bokem kvuli resetu.
-const rotor: string[] = [...rotorDefault];
+// Pracovní kopie rotoru, která bude mutovat (otáčet se)
+let rotor: string[] = [...rotorMap];
 
-export function resetRotor(): void {
-    rotor.length = 0;
-    rotor.push(...rotorDefault);
+/**
+ * Resetuje rotor do původního stavu.
+ * Je důležité volat tuto funkci před každým novým šifrováním,
+ * aby se zajistily konzistentní a opakovatelné výsledky.
+ */
+function resetRotor(): void {
+    rotor = [...rotorMap];
 }
 
 /**
- * Normalizuje vstup na jedno velke pismeno A-Z.
- * - mezery a bezne oddelovace vraci beze zmeny
- * - mala pismena mapuje na velka
- * - znaky mimo A-Z (diakritika, emoji, interpunkce) vraci beze zmeny
+ * Funkce pro jednoduché šifrování bez pohybu rotoru.
+ * @param text Vstupní text k zašifrování.
+ * @returns Zašifrovaný text.
  */
-function normalizeAZ(ch: string): { kind: "az"; upper: string } | { kind: "passthrough"; value: string } {
-    if (!ch) return { kind: "passthrough", value: ch };
+function sifrujStaticky(text: string): string {
+    let vystup = "";
+    for (const znak of text) {
+        const velkyZnak = znak.toUpperCase();
+        const kod = velkyZnak.charCodeAt(0);
 
-    // pokud je to mala/velka latina, udelej velke
-    const upper = ch.toUpperCase();
-    if (upper.length !== 1) return { kind: "passthrough", value: ch };
-
-    const code = upper.charCodeAt(0);
-    const isAZ = code >= 65 && code <= 90;
-    if (!isAZ) return { kind: "passthrough", value: ch };
-
-    return { kind: "az", upper };
-}
-
-// 1) Staticka substituce (BEZ pohybu rotoru)
-export function sifrujStaticky(znak: string): string {
-    const n = normalizeAZ(znak);
-    if (n.kind === "passthrough") return n.value;
-
-    const index = n.upper.charCodeAt(0) - 65;
-    return rotor[index];
-}
-
-// 2) Mini-enigma (1 rotor): TAM -> reflektor -> ZPET + posuv rotoru po znaku
-export function enigma(znak: string): string {
-    const n = normalizeAZ(znak);
-    if (n.kind === "passthrough") return n.value;
-
-    // mapovani vstupu na index 0..25
-    const index = n.upper.charCodeAt(0) - 65;
-
-    // cesta TAM: rotor[index] -> znak
-    const znakTam = rotor[index];
-
-    // reflektor: reflektor[index(znakTam)]
-    const indexRefl = znakTam.charCodeAt(0) - 65;
-    const znakRefl = reflektor[indexRefl];
-
-    // cesta ZPET: najdi pozici znaku z reflektoru v rotoru
-    const indexZpet = rotor.indexOf(znakRefl);
-    const vystup = String.fromCharCode(indexZpet + 65);
-
-    // mechanicky posuv rotoru (rotace o 1)
-    rotor.push(rotor.shift()!);
-
+        // Zpracováváme pouze písmena anglické abecedy (A-Z)
+        if (kod >= 65 && kod <= 90) {
+            const index = kod - 65;
+            vystup += rotorMap[index];
+        } else {
+            // Ostatní znaky (mezery, čísla, diakritika) ponecháme beze změny
+            vystup += znak;
+        }
+    }
     return vystup;
 }
 
-export type Mode = "staticky" | "enigma";
+/**
+ * Simuluje šifrování jedním rotorem a reflektorem stroje Enigma.
+ * Funkce zpracovává celý text, otáčí rotorem po každém zašifrovaném znaku.
+ * @param text Vstupní text k zašifrování nebo dešifrování.
+ * @returns Zašifrovaný nebo dešifrovaný text.
+ */
+function enigma(text: string): string {
+    let vystup = "";
+    for (const znak of text) {
+        const velkyZnak = znak.toUpperCase();
+        const kod = velkyZnak.charCodeAt(0);
 
-export function sifrujText(text: string, mode: Mode): string {
-    const fn = mode === "staticky" ? sifrujStaticky : enigma;
-    let out = "";
-    for (const ch of text) out += fn(ch);
-    return out;
-}
+        // Zpracováváme pouze písmena anglické abecedy (A-Z)
+        if (kod >= 65 && kod <= 90) {
+            // 1. Normalizace vstupu na index 0-25
+            const indexVstup = kod - 65;
 
-// Pomucka pro rychle testy v konzoli prohlizece (bez bundleru)
-declare global {
-    interface Window {
-        enigmaDemo?: {
-            reset: () => void;
-            stat: (s: string) => string;
-            run: (s: string) => string;
-        };
+            // 2. Cesta TAM: Rotor
+            const znakTam = rotor[indexVstup];
+
+            // 3. Reflektor
+            const indexRefl = znakTam.charCodeAt(0) - 65;
+            const znakRefl = reflektorMap[indexRefl];
+
+            // 4. Cesta ZPĚT: Rotor (hledání hodnoty)
+            const indexZpet = rotor.indexOf(znakRefl);
+            const znakVystup = String.fromCharCode(indexZpet + 65);
+            vystup += znakVystup;
+            
+            // 5. Mechanický posuv rotoru
+            rotor.push(rotor.shift()!);
+
+        } else {
+            // Ostatní znaky (mezery, čísla, diakritika) ponecháme beze změny
+            vystup += znak;
+        }
     }
+    return vystup;
 }
 
-window.enigmaDemo = {
-    reset: () => resetRotor(),
-    stat: (s: string) => sifrujText(s, "staticky"),
-    run: (s: string) => sifrujText(s, "enigma"),
-};
+// --- Ověření funkčnosti v konzoli ---
 
-const text: string = "Hello, World!";
-
-
+console.log("--- Úkol 1: Statická substituce ---");
+const test1_vstup = "AAAA";
+const test1_vystup = sifrujStaticky(test1_vstup);
+console.log(`Vstup: "${test1_vstup}" -> Výstup: "${test1_vystup}" (Očekáváno: "EEEE")`);
+console.log("Test s mezerami a malými písmeny:", sifrujStaticky("Hello World"));
 
 
+console.log("\n--- Úkol 2: Simulace Enigmy ---");
 
+// Test šifrování
+resetRotor(); // Reset rotoru před šifrováním
+const test2_vstup = "AAAA";
+const test2_vystup = enigma(test2_vstup);
+console.log(`Šifrování: Vstup: "${test2_vstup}" -> Výstup: "${test2_vystup}" (Očekáváno: "HJKP")`);
 
+// Test dešifrování (reciprocita)
+resetRotor(); // Reset rotoru před dešifrováním
+const test3_vstup = "HJKP";
+const test3_vystup = enigma(test3_vstup);
+console.log(`Dešifrování: Vstup: "${test3_vstup}" -> Výstup: "${test3_vystup}" (Očekáváno: "AAAA")`);
 
+// Test s celou větou
+resetRotor();
+const veta = "TAJNA ZPRAVA";
+const sifrovanaVeta = enigma(veta);
+console.log(`Šifrování věty: "${veta}" -> "${sifrovanaVeta}"`);
 
+resetRotor();
+// --- Logika pro propojení s uživatelským rozhraním ---
+document.addEventListener("DOMContentLoaded", () => {
+    // Elementy pro statickou substituci
+    const staticInput = document.getElementById("static-input") as HTMLTextAreaElement;
+    const staticOutput = document.getElementById("static-output") as HTMLTextAreaElement;
+    const staticEncryptBtn = document.getElementById("static-encrypt-btn") as HTMLButtonElement;
 
+    // Elementy pro Enigma simulaci
+    const enigmaInput = document.getElementById("enigma-input") as HTMLTextAreaElement;
+    const enigmaOutput = document.getElementById("enigma-output") as HTMLTextAreaElement;
+    const enigmaProcessBtn = document.getElementById("enigma-process-btn") as HTMLButtonElement;
+    const enigmaResetBtn = document.getElementById("enigma-reset-btn") as HTMLButtonElement;
 
+    // Event listener pro statickou substituci
+    staticEncryptBtn.addEventListener("click", () => {
+        const inputText = staticInput.value;
+        staticOutput.value = sifrujStaticky(inputText);
+    });
 
+    // Event listener pro šifrování/dešifrování Enigmou
+    enigmaProcessBtn.addEventListener("click", () => {
+        const inputText = enigmaInput.value;
+        enigmaOutput.value = enigma(inputText);
+    });
 
-
-
-
+    // Event listener pro resetování rotoru
+    enigmaResetBtn.addEventListener("click", () => {
+        resetRotor();
+        // Informujeme uživatele, že rotor byl resetován (nepovinné)
+        enigmaInput.value = "";
+        enigmaOutput.value = "";
+        enigmaInput.placeholder = "Rotor byl resetován. Zadejte nový text...";
+    });
+});
