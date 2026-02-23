@@ -25,25 +25,35 @@
                     <button id="static-encrypt-btn">→</button>
                     <textarea id="static-output" readonly placeholder="Výsledek..."></textarea>
                 </div>
+                <!-- Volitelné dešifrování pro statickou substituci -->
+                <div class="io-panel">
+                    <textarea id="static-input-decrypt" placeholder="Zadejte text pro statickou dešifru..."></textarea>
+                    <button id="static-decrypt-btn">←</button>
+                    <textarea id="static-output-decrypt" readonly placeholder="Dešifrovaný výsledek..."></textarea>
+                </div>
             </section>
 
             <section class="simulator">
                 <h2>Úkol 2: Simulace Enigmy</h2>
                 <p>Tato funkce simuluje kompletní cyklus Enigmy s jedním rotorem, reflektorem a mechanickým otáčením po každém znaku. Díky reciprocitě funguje stejně pro šifrování i dešifrování.</p>
-                <div class="io-panel">
-                    <textarea id="enigma-input" placeholder="Zadejte text k šifrování/dešifrování..."></textarea>
-                    <div class="enigma-controls">
-                        <button id="enigma-process-btn">Šifrovat / Dešifrovat</button>
-                        <button id="enigma-reset-btn">Resetovat Rotor</button>
-                    </div>
-                    <textarea id="enigma-output" readonly placeholder="Výsledek..."></textarea>
+                <h3>Šifrování / Dešifrování</h3>
+                <div class="rotor-config">
+                    <label for="rotor-start">Počáteční pozice rotoru (písmeno A-Z nebo číslo 0-25):</label>
+                    <input id="rotor-start" type="text" maxlength="2" placeholder="A nebo 0" />
                 </div>
+                <div class="io-panel">
+                    <textarea id="enigma-encrypt-input" placeholder="Zadejte čistý text..."></textarea>
+                    <button id="enigma-encrypt-btn">→</button>
+                    <textarea id="enigma-encrypt-output" readonly placeholder="Zašifrovaný text..."></textarea>
+                </div>
+                <div class="io-panel">
+                    <textarea id="enigma-decrypt-input" placeholder="Zadejte zašifrovaný text..."></textarea>
+                    <button id="enigma-decrypt-btn">←</button>
+                    <textarea id="enigma-decrypt-output" readonly placeholder="Dešifrovaný text..."></textarea>
+                </div>
+                
             </section>
         </main>
-        
-        <footer>
-            <p>Vytvořil student jako projekt do IT. Inspirováno historií a prací Alana Turinga.</p>
-        </footer>
     </div>
     <script src="script.js"></script>
 </body>
